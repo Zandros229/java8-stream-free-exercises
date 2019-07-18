@@ -50,7 +50,7 @@ class WorkShop {
      * Zwraca nazwy wszystkich holdingów pisane z małej litery w formie listy.
      */
     List<String> getHoldingNames() {
-        return null;
+        return holdings.stream().map(holding -> holding.getName().toLowerCase()).collect(toList());
     }
 
     /**
