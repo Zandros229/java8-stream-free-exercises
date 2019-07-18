@@ -58,14 +58,18 @@ class WorkShop {
      * String ma postać: (Coca-Cola, Nestle, Pepsico)
      */
     String getHoldingNamesAsString() {
-        return null;
+        return "("+holdings.stream().map(Holding::getName).sorted().reduce((String s,String s2)->{
+            StringBuilder stringBuilder=new StringBuilder(s);
+            stringBuilder.append(", "+s2);
+            return stringBuilder.toString();
+        }).get()+")";
     }
 
     /**
      * Zwraca liczbę firm we wszystkich holdingach.
      */
     long getCompaniesAmount() {
-        return 0l;
+        return holdings.stream().flatMap(holding -> holding.getCompanies().stream()).count();
     }
 
     /**
