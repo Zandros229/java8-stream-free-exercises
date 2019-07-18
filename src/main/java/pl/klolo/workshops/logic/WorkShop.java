@@ -33,6 +33,12 @@ class WorkShop {
 
     private final Predicate<User> isWoman = user -> user.getSex().equals(Sex.WOMAN);
     private Predicate<User> isMan = m -> m.getSex() == Sex.MAN;
+    private Function<List<Holding>, Stream<String>> getCompanyNamesString
+            = holdings -> {
+        return holdings.stream()
+                .flatMap(holding -> holding.getCompanies().stream())
+                .map(Company::getName);
+    };
 
     WorkShop() {
         final HoldingMockGenerator holdingMockGenerator = new HoldingMockGenerator();
@@ -58,11 +64,11 @@ class WorkShop {
      * String ma postać: (Coca-Cola, Nestle, Pepsico)
      */
     String getHoldingNamesAsString() {
-        return "("+holdings.stream().map(Holding::getName).sorted().reduce((String s,String s2)->{
-            StringBuilder stringBuilder=new StringBuilder(s);
-            stringBuilder.append(", "+s2);
+        return "(" + holdings.stream().map(Holding::getName).sorted().reduce((String s, String s2) -> {
+            StringBuilder stringBuilder = new StringBuilder(s);
+            stringBuilder.append(", " + s2);
             return stringBuilder.toString();
-        }).get()+")";
+        }).get() + ")";
     }
 
     /**
@@ -76,7 +82,10 @@ class WorkShop {
      * Zwraca liczbę wszystkich pracowników we wszystkich firmach.
      */
     long getAllUserAmount() {
-        return 0l;
+        return holdings.stream()
+                .flatMap(holding -> holding.getCompanies().stream())
+                .flatMap(company -> company.getUsers().stream())
+                .count();
     }
 
     /**
@@ -84,7 +93,7 @@ class WorkShop {
      * później będziesz wykorzystywać.
      */
     List<String> getAllCompaniesNames() {
-        return null;
+        return getCompanyNamesString.apply(holdings).collect(toList());
     }
 
     /**
