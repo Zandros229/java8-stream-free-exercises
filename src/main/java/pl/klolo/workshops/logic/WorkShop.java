@@ -39,6 +39,14 @@ class WorkShop {
                 .flatMap(holding -> holding.getCompanies().stream())
                 .map(Company::getName);
     };
+    private Function<List<Holding>,List<String>> getCurrenciesAsList = holdings-> holdings.stream()
+            .flatMap((holding -> holding.getCompanies().stream()))
+            .flatMap(company -> company.getUsers().stream())
+            .flatMap(user -> user.getAccounts().stream())
+            .map(account -> account.getCurrency().name())
+            .distinct()
+            .sorted()
+            .collect(Collectors.toList());
 
     WorkShop() {
         final HoldingMockGenerator holdingMockGenerator = new HoldingMockGenerator();
@@ -141,7 +149,10 @@ class WorkShop {
      * Zwraca liczbę wszystkich rachunków, użytkowników we wszystkich firmach.
      */
     long getAllUserAccountsAmount() {
-        return 0l;
+        return holdings.stream().flatMap((holding -> holding.getCompanies().stream()))
+                .flatMap(company -> company.getUsers().stream())
+                .flatMap(user -> user.getAccounts().stream())
+                .count();
     }
 
     /**
@@ -149,9 +160,19 @@ class WorkShop {
      * występują bez powtórzeń i są posortowane.
      */
     String getAllCurrencies() {
-        final List<String> currencies = getAllCurrenciesToListAsString();
-
-        return null;
+        return holdings.stream()
+                .flatMap((holding -> holding.getCompanies().stream()))
+                .flatMap(company -> company.getUsers().stream())
+                .flatMap(user -> user.getAccounts().stream())
+                .map(account -> account.getCurrency().name())
+                .distinct()
+                .sorted()
+                .collect(Collectors.joining(", "));
+//                .reduce(((allCurrencies, currencies1) -> {
+//                    StringBuilder stringBuilder=new StringBuilder(allCurrencies);
+//                    stringBuilder.append(", "+currencies1);
+//                    return stringBuilder.toString();
+//                })).get();
     }
 
     /**
@@ -161,9 +182,13 @@ class WorkShop {
      * @see #getAllCurrencies()
      */
     String getAllCurrenciesUsingGenerate() {
-        final List<String> currencies = getAllCurrenciesToListAsString();
+        final List<String> currencies = getCurrenciesAsList.apply(holdings);
 
-        return null;
+        return Stream.generate(currencies.iterator()::next)
+                .limit(currencies.size())
+                .distinct()
+                .sorted()
+                .collect(joining(", "));
     }
 
     private List<String> getAllCurrenciesToListAsString() {
