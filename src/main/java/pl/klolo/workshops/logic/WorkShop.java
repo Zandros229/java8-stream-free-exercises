@@ -101,7 +101,7 @@ class WorkShop {
      * po zakończeniu działania strumienia.
      */
     LinkedList<String> getAllCompaniesNamesAsLinkedList() {
-        return null;
+        return getCompanyNamesString.apply(holdings).collect(()->new LinkedList<String>(),(LinkedList list,String name)-> list.add(name),LinkedList::addAll );
     }
 
     /**
