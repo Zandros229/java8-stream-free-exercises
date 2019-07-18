@@ -108,7 +108,11 @@ class WorkShop {
      * Zwraca listę firm jako String gdzie poszczególne firmy są oddzielone od siebie znakiem "+"
      */
     String getAllCompaniesNamesAsString() {
-        return null;
+        return getCompanyNamesString.apply(holdings).reduce((name,name2)->{
+            StringBuilder stringBuilder=new StringBuilder(name);
+            stringBuilder.append("+").append(name2);
+            return stringBuilder.toString();
+        }).get().toString();
     }
 
     /**
@@ -119,7 +123,18 @@ class WorkShop {
      */
     String getAllCompaniesNamesAsStringUsingStringBuilder() {
         AtomicBoolean first = new AtomicBoolean(false);
-        return null;
+        return getCompanyNamesString.apply(holdings).collect(Collector.of(()->new StringBuilder(), (StringBuilder stringBuilder,String s) ->
+                {
+                    if(stringBuilder.length()==0)
+                        stringBuilder.append(s);
+                    else
+                        stringBuilder.append("+"+s);
+                },
+                (StringBuilder buf1,StringBuilder buf2) -> {
+                    buf1.append( buf2 );
+                    return( buf1 );
+                },
+                (StringBuilder buf)-> buf.toString()));
     }
 
     /**
